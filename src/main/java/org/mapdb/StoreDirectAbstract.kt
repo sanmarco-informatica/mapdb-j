@@ -56,8 +56,9 @@ abstract class StoreDirectAbstract(
 
     protected val closed = AtomicBoolean(false)
 
-    override val isClosed:Boolean
-        get() = closed.get()
+    override fun isClosed(): Boolean {
+        return closed.get()
+    }
 
     protected fun assertNotClosed(){
         if(closed.get())

@@ -118,7 +118,9 @@ class StoreOnHeap(
         }
     }
 
-    override val isClosed = false
+    override fun isClosed(): Boolean {
+        return false;
+    }
 
     override fun <R> get(recid: Long, serializer: Serializer<R>): R? {
         val record = Utils.lockRead(lock) {
@@ -138,7 +140,9 @@ class StoreOnHeap(
     override fun verify() {
     }
 
-    override val isReadOnly = false
+    override fun isReadOnly(): Boolean {
+        return false;
+    }
 
     override fun fileLoad() = false
 
