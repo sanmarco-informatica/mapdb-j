@@ -504,7 +504,7 @@ class StoreDirect(
             allocateRecid()
         }
 
-        Utils.lockWrite(locks[recidToSegment(recid)]) {
+        return Utils.lockWrite(locks[recidToSegment(recid)]) {
             if (CC.ASSERT) {
                 val oldVal = volume.getLong(recidToOffset(recid))
                 if(oldVal!=0L && indexValToSize(oldVal)!=DELETED_RECORD_SIZE)
@@ -513,19 +513,19 @@ class StoreDirect(
 
             //set allocated flag
             setIndexVal(recid, indexValCompose(size = NULL_RECORD_SIZE, offset = 0, linked = 0, unused = 1, archive = 1))
-            return recid
+            return@lockWrite recid
         }
     }
 
     override fun <R> get(recid: Long, serializer: Serializer<R>): R? {
         assertNotClosed()
 
-        Utils.lockRead(locks[recidToSegment(recid)]) {
+        return Utils.lockRead(locks[recidToSegment(recid)]) {
             val indexVal = getIndexVal(recid);
 
             if (indexValFlagLinked(indexVal)) {
                 val di = linkedRecordGet(indexVal)
-                return deserialize(serializer, DataInput2.ByteArray(di), di.size.toLong())
+                return@lockRead deserialize(serializer, DataInput2.ByteArray(di), di.size.toLong())
             }
 
             var size = indexValToSize(indexVal);
@@ -533,18 +533,18 @@ class StoreDirect(
                 throw DBException.GetVoid(recid)
 
             if (size == NULL_RECORD_SIZE)
-                return null;
+                return@lockRead null;
 
             val offset = indexValToOffset(indexVal);
 
             if(size<6){
                  if(CC.ASSERT && size>5)
                     throw DBException.DataCorruption("wrong size record header");
-                return serializer.deserializeFromLong(offset.ushr(8), size.toInt())
+                return@lockRead serializer.deserializeFromLong(offset.ushr(8), size.toInt())
             }
 
             val di = volume.getDataInput(offset, size.toInt())
-            return deserialize(serializer, di, size)
+            return@lockRead deserialize(serializer, di, size)
         }
     }
 
@@ -553,12 +553,12 @@ class StoreDirect(
     override fun getBinaryLong(recid:Long, f: StoreBinaryGetLong): Long {
         assertNotClosed()
 
-        Utils.lockRead(locks[recidToSegment(recid)]) {
+        return Utils.lockRead(locks[recidToSegment(recid)]) {
             val indexVal = getIndexVal(recid);
 
             if (indexValFlagLinked(indexVal)) {
                 val di = linkedRecordGet(indexVal)
-                return f.get(DataInput2.ByteArray(di), di.size)
+                return@lockRead f.get(DataInput2.ByteArray(di), di.size)
             }
 
 
@@ -567,7 +567,7 @@ class StoreDirect(
                 throw DBException.GetVoid(recid)
 
             if (size == NULL_RECORD_SIZE)
-                return Long.MIN_VALUE;
+                return@lockRead Long.MIN_VALUE;
 
             val offset = indexValToOffset(indexVal);
             val sizeInt = size.toInt()
@@ -580,7 +580,7 @@ class StoreDirect(
                     DataInput2.ByteArray(buf)
                 }
 
-            return f.get(di,sizeInt)
+            return@lockRead f.get(di,sizeInt)
         }
     }
 
@@ -589,22 +589,22 @@ class StoreDirect(
 
         val di = serialize(record, serializer);
 
-        Utils.lockRead(compactionLock) {
+        return Utils.lockRead(compactionLock) {
             val recid = Utils.lock(structuralLock) {
                 allocateRecid()
             }
 
-            Utils.lockWrite(locks[recidToSegment(recid)]) {
+            return@lockRead Utils.lockWrite(locks[recidToSegment(recid)]) {
                 if (di == null) {
                     setIndexVal(recid, indexValCompose(size = NULL_RECORD_SIZE, offset = 0, linked = 0, unused = 0, archive = 1))
-                    return recid
+                    return@lockWrite recid
                 }
 
                 if (di.pos > MAX_RECORD_SIZE) {
                     //save as linked record
                     val indexVal = linkedRecordPut(di.buf, di.pos)
                     setIndexVal(recid, indexVal);
-                    return recid
+                    return@lockWrite recid
                 }
                 val size = di.pos.toLong()
                 var offset: Long
@@ -622,7 +622,7 @@ class StoreDirect(
                 }
 
                 setIndexVal(recid, indexValCompose(size = size, offset = offset, linked = 0, unused = 0, archive = 1))
-                return recid;
+                return@lockWrite recid;
             }
         }
     }
@@ -700,22 +700,22 @@ class StoreDirect(
 
     override fun <R> compareAndSwap(recid: Long, expectedOldRecord: R?, newRecord: R?, serializer: Serializer<R>): Boolean {
         assertNotClosed()
-        Utils.lockWrite(locks[recidToSegment(recid)]) {
+        return Utils.lockWrite(locks[recidToSegment(recid)]) {
             //compare old value
             val old = get(recid, serializer)
 
             if (old === null && expectedOldRecord !== null)
-                return false;
+                return@lockWrite false;
             if (old !== null && expectedOldRecord === null)
-                return false;
+                return@lockWrite false;
 
             if (old !== expectedOldRecord && !serializer.equals(old!!, expectedOldRecord!!))
-                return false
+                return@lockWrite false
 
             val di = serialize(newRecord, serializer);
 
             updateProtected(recid, di)
-            return true;
+            return@lockWrite true;
         }
     }
 
@@ -1071,16 +1071,16 @@ class StoreDirect(
         var ret = freeSize.get()
         if (ret != -1L)
             return ret
-        Utils.lock(structuralLock){
+        return Utils.lock(structuralLock){
             //try one more time under lock
             ret = freeSize.get()
             if (ret != -1L)
-                return ret
+                return@lock ret
             ret = calculateFreeSize()
 
             freeSize.set(ret)
 
-            return ret
+            return@lock ret
         }
     }
 

@@ -19,11 +19,11 @@ class IndexTreeList<E> (
     val lock = if(isThreadSafe) ReentrantReadWriteLock() else null
 
     override fun add(element: E?): Boolean {
-        Utils.lockWrite(lock) {
+        return Utils.lockWrite(lock) {
             val index = size++
             val recid = store.put(element, serializer)
             map.put(index.toLong(), recid)
-            return true
+            return@lockWrite true
         }
     }
 
@@ -59,7 +59,7 @@ class IndexTreeList<E> (
     }
 
     override fun removeAt(index: Int): E? {
-        Utils.lockWrite(lock) {
+        return Utils.lockWrite(lock) {
             checkIndex(index)
             val recid = map[index.toLong()]
             val ret = if (recid == 0L) {
@@ -79,21 +79,21 @@ class IndexTreeList<E> (
                 map.put((i - 1).toLong(), recid)
             }
             size--
-            return ret;
+            return@lockWrite ret;
         }
     }
 
     override fun set(index: Int, element: E?): E? {
-        Utils.lockWrite(lock) {
+        return Utils.lockWrite(lock) {
             checkIndex(index)
             val recid = map[index.toLong()]
             if (recid == 0L) {
                 map.put(index.toLong(), store.put(element, serializer))
-                return null;
+                return@lockWrite null;
             } else {
                 val ret = store.get(recid, serializer)
                 store.update(recid, element, serializer)
-                return ret
+                return@lockWrite ret
             }
         }
     }
@@ -104,14 +104,14 @@ class IndexTreeList<E> (
     }
 
     override fun get(index: Int): E? {
-        Utils.lockRead(lock) {
+        return Utils.lockRead(lock) {
             checkIndex(index)
 
             val recid = map[index.toLong()]
             if (recid == 0L) {
-                return null;
+                return@lockRead null;
             }
-            return store.get(recid, serializer)
+            return@lockRead store.get(recid, serializer)
         }
     }
 
@@ -126,19 +126,19 @@ class IndexTreeList<E> (
             @Volatile var index = 0;
             @Volatile var indexToRemove:Int?=null;
             override fun hasNext(): Boolean {
-                Utils.lockRead(lock) {
-                    return index < this@IndexTreeList.size
+                return Utils.lockRead(lock) {
+                    return@lockRead index < this@IndexTreeList.size
                 }
             }
 
             override fun next(): E? {
-                Utils.lockRead(lock) {
+                return Utils.lockRead(lock) {
                     if (index >= this@IndexTreeList.size)
                         throw NoSuchElementException()
                     indexToRemove = index
                     val ret = this@IndexTreeList[index]
                     index++;
-                    return ret;
+                    return@lockRead ret;
                 }
             }
 

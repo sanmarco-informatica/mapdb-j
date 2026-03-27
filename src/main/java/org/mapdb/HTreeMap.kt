@@ -688,11 +688,11 @@ class HTreeMap<K,V>(
     }
 
     override fun isEmpty(): Boolean {
-        for(segment in 0 until segmentCount) {
-            Utils.lockRead(locks[segment]) {
-                if (!indexTrees[segment].isEmpty)
-                    return false
+        for (segment in 0 until segmentCount) {
+            val v = Utils.lockRead(locks[segment]) {
+                return@lockRead indexTrees[segment].isEmpty
             }
+            if (!v) return false;
         }
         return true;
     }
@@ -1047,9 +1047,9 @@ class HTreeMap<K,V>(
             var lastKey:K? = null;
 
             private fun moveToNextLeaf(): Array<Any?>? {
-                Utils.lockRead(locks[segment]) {
+               return Utils.lockRead(locks[segment]) {
                     if (!leafRecidIter.hasNext()) {
-                        return null
+                        return@lockRead null
                     }
                     val leafRecid = leafRecidIter.next()
                     val leaf = leafGet(store, leafRecid)
@@ -1060,7 +1060,7 @@ class HTreeMap<K,V>(
                         //TODO PERF key is deserialized twice, modify iterators...
                         ret[i + 1] = leaf[i] as K
                     }
-                    return ret
+                    return@lockRead ret
                 }
             }
 
@@ -1345,7 +1345,7 @@ class HTreeMap<K,V>(
     }
 
     override fun isThreadSafe(): Boolean {
-        return isThreadSafe;
+        return threadSafe;
     }
 
     override fun checkThreadSafe() {
