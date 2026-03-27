@@ -58,7 +58,9 @@ class HTreeMap<K,V>(
                 dirShift: Int = CC.HTREEMAP_DIR_SHIFT,
                 levels:Int = CC.HTREEMAP_LEVELS,
                 stores:Array<Store> = Array(1.shl(concShift), {StoreTrivial()}),
-                indexTrees: Array<MutableLongLongMap> = Array(1.shl(concShift), { i->IndexTreeLongLongMap.make(stores[i], levels=levels, dirShift = dirShift)}),
+                indexTrees: Array<MutableLongLongMap> = Array(
+                    1.shl(concShift),
+                    { i -> IndexTreeLongLongMap.make(stores[i], null, dirShift, levels, null) }),
                 hashSeed:Int = SecureRandom().nextInt(),
                 counterRecids:LongArray? = null,
                 expireCreateTTL:Long = 0L,

@@ -827,11 +827,11 @@ open class DB(
 
             val indexTrees = Array<MutableLongLongMap>(1.shl(_concShift), { segment ->
                 IndexTreeLongLongMap(
-                        store = stores[segment],
-                        rootRecid = rootRecids[segment],
-                        dirShift = _dirShift,
-                        levels = _levels,
-                        collapseOnRemove = _removeCollapsesIndexTree
+                    stores[segment],
+                    rootRecids[segment],
+                    _dirShift,
+                    _levels,
+                    _removeCollapsesIndexTree
                 )
             })
 
@@ -916,11 +916,11 @@ open class DB(
 
             val indexTrees = Array<MutableLongLongMap>(1.shl(_concShift), { segment ->
                 IndexTreeLongLongMap(
-                        store = stores[segment],
-                        rootRecid = rootRecids[segment],
-                        dirShift = _dirShift,
-                        levels = _levels,
-                        collapseOnRemove = _removeCollapsesIndexTree
+                    stores[segment],
+                    rootRecids[segment],
+                    _dirShift,
+                    _levels,
+                    _removeCollapsesIndexTree
                 )
             })
             return HTreeMap(
@@ -1570,20 +1570,21 @@ open class DB(
             val rootRecid = db.store.put(IndexTreeListJava.dirEmpty(), IndexTreeListJava.dirSer)
             catalog[name+Keys.rootRecid] = rootRecid.toString()
             return IndexTreeLongLongMap(
-                    store=db.store,
-                    rootRecid = rootRecid,
-                    dirShift = _dirShift,
-                    levels=_levels,
-                    collapseOnRemove = _removeCollapsesIndexTree);
+                    db.store,
+                     rootRecid,
+                     _dirShift,
+                    _levels,
+                     _removeCollapsesIndexTree);
         }
 
         override fun open2(catalog: SortedMap<String, String>): IndexTreeLongLongMap {
             return IndexTreeLongLongMap(
-                    store = db.store,
-                    dirShift = catalog[name+Keys.dirShift]!!.toInt(),
-                    levels = catalog[name+Keys.levels]!!.toInt(),
-                    rootRecid = catalog[name+Keys.rootRecid]!!.toLong(),
-                    collapseOnRemove = catalog[name + Keys.removeCollapsesIndexTree]!!.toBoolean())
+                db.store,
+                catalog[name + Keys.rootRecid]!!.toLong(),
+                catalog[name + Keys.dirShift]!!.toInt(),
+                catalog[name + Keys.levels]!!.toInt(),
+                catalog[name + Keys.removeCollapsesIndexTree]!!.toBoolean()
+            )
         }
     }
 
@@ -1629,11 +1630,11 @@ open class DB(
             val rootRecid = db.store.put(IndexTreeListJava.dirEmpty(), IndexTreeListJava.dirSer)
             catalog[name+Keys.rootRecid] = rootRecid.toString()
             val map = IndexTreeLongLongMap(
-                    store=db.store,
-                    rootRecid = rootRecid,
-                    dirShift = _dirShift,
-                    levels=_levels,
-                    collapseOnRemove = _removeCollapsesIndexTree);
+                    db.store,
+                     rootRecid,
+                     _dirShift,
+                    _levels,
+                     _removeCollapsesIndexTree);
 
             return IndexTreeList(
                     db.store,
@@ -1646,11 +1647,11 @@ open class DB(
 
         override fun open2(catalog: SortedMap<String, String>): IndexTreeList<E> {
             val map =  IndexTreeLongLongMap(
-                    store = db.store,
-                    dirShift = catalog[name+Keys.dirShift]!!.toInt(),
-                    levels = catalog[name+Keys.levels]!!.toInt(),
-                    rootRecid = catalog[name+Keys.rootRecid]!!.toLong(),
-                    collapseOnRemove = catalog[name + Keys.removeCollapsesIndexTree]!!.toBoolean())
+                db.store,
+                catalog[name + Keys.rootRecid]!!.toLong(),
+                catalog[name + Keys.dirShift]!!.toInt(),
+                catalog[name + Keys.levels]!!.toInt(),
+                catalog[name + Keys.removeCollapsesIndexTree]!!.toBoolean())
             return IndexTreeList(
                     db.store,
                     map,
