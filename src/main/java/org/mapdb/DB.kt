@@ -1636,11 +1636,11 @@ open class DB(
                     collapseOnRemove = _removeCollapsesIndexTree);
 
             return IndexTreeList(
-                    store = db.store,
-                    map = map,
-                    serializer = serializer,
-                    isThreadSafe = db.isThreadSafe,
-                    counterRecid = counterRecid
+                    db.store,
+                    map,
+                    serializer,
+                    db.isThreadSafe,
+                    counterRecid
             )
         }
 
@@ -1652,11 +1652,11 @@ open class DB(
                     rootRecid = catalog[name+Keys.rootRecid]!!.toLong(),
                     collapseOnRemove = catalog[name + Keys.removeCollapsesIndexTree]!!.toBoolean())
             return IndexTreeList(
-                    store = db.store,
-                    map = map,
-                    serializer =  db.nameCatalogGetClass(catalog, name + Keys.serializer)?: serializer,
-                    isThreadSafe = db.isThreadSafe,
-                    counterRecid = catalog[name+Keys.counterRecid]!!.toLong()
+                    db.store,
+                    map,
+                    db.nameCatalogGetClass(catalog, name + Keys.serializer)?: serializer,
+                    db.isThreadSafe,
+                    catalog[name+Keys.counterRecid]!!.toLong()
             )
         }
     }
