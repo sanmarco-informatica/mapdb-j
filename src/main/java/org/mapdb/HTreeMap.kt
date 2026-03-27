@@ -37,7 +37,7 @@ class HTreeMap<K,V>(
         val expireExecutor: ScheduledExecutorService?,
         val expireExecutorPeriod:Long,
         val expireCompactThreshold:Double?,
-        override val isThreadSafe:Boolean,
+        val threadSafe:Boolean,
         val valueLoader:((key:K)->V?)?,
         private val modificationListeners: Array<MapModificationListener<K,V>>?,
         private val closeable:Closeable?,
@@ -98,7 +98,7 @@ class HTreeMap<K,V>(
                 expireExecutor = expireExecutor,
                 expireExecutorPeriod = expireExecutorPeriod,
                 expireCompactThreshold = expireCompactThreshold,
-                isThreadSafe = isThreadSafe,
+                threadSafe = isThreadSafe,
                 valueLoader = valueLoader,
                 modificationListeners = modificationListeners,
                 closeable = closeable
@@ -1342,6 +1342,10 @@ class HTreeMap<K,V>(
         }finally{
             Utils.unlockWriteAll(locks)
         }
+    }
+
+    override fun isThreadSafe(): Boolean {
+        return isThreadSafe;
     }
 
     override fun checkThreadSafe() {

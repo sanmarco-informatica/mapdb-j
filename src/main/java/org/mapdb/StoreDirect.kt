@@ -18,7 +18,7 @@ class StoreDirect(
         volumeFactory: VolumeFactory,
         override val isReadOnly:Boolean,
         fileLockWait:Long,
-        isThreadSafe:Boolean,
+        threadSafe:Boolean,
         concShift:Int,
         allocateIncrement: Long,
         allocateStartSize:Long,
@@ -31,7 +31,7 @@ class StoreDirect(
 ):StoreDirectAbstract(
         file=file,
         volumeFactory=volumeFactory,
-        isThreadSafe = isThreadSafe,
+        threadSafe = threadSafe,
         concShift =  concShift,
         fileDeleteAfterClose = fileDeleteAfterClose,
         checksum = checksum,
@@ -60,7 +60,7 @@ class StoreDirect(
             volumeFactory = volumeFactory,
             fileLockWait = fileLockWait,
             isReadOnly = isReadOnly,
-            isThreadSafe = isThreadSafe,
+            threadSafe = isThreadSafe,
             concShift = concShift,
             allocateIncrement = allocateIncrement,
             allocateStartSize = allocateStartSize,
@@ -1116,6 +1116,10 @@ class StoreDirect(
     override fun getAllFiles(): Iterable<String> {
         if(file==null) return Arrays.asList<String>()
         else return Arrays.asList(file)
+    }
+
+    override fun isThreadSafe(): Boolean {
+        return threadSafe;
     }
 
 }

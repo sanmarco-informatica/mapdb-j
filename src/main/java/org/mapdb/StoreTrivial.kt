@@ -20,7 +20,7 @@ import java.util.concurrent.locks.ReadWriteLock
  * It optionally persist its content into file, in this case it supports rollback and durability.
  */
 open class StoreTrivial(
-        override val isThreadSafe:Boolean=true
+        val threadSafe:Boolean=true
     ):Store {
 
     protected val lock: ReadWriteLock? = Utils.newReadWriteLock(isThreadSafe)
@@ -321,11 +321,15 @@ open class StoreTrivial(
         return arrayListOf()
     }
 
+    override fun isThreadSafe(): Boolean {
+        return isThreadSafe;
+    }
+
 }
 
 class StoreTrivialTx(val file:File, isThreadSafe:Boolean=true, val deleteFilesAfterClose:Boolean=false)
     :StoreTrivial(
-        isThreadSafe = isThreadSafe
+        threadSafe = isThreadSafe
     ), StoreTx{
 
     val path = file.toPath()

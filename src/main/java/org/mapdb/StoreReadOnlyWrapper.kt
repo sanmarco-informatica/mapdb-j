@@ -28,9 +28,6 @@ class StoreReadOnlyWrapper(protected val store:Store):Store{
     override val isClosed: Boolean
         get() = store.isClosed
 
-    override val isThreadSafe: Boolean
-        get() = store.isThreadSafe
-
     override val isReadOnly = true
 
     override fun preallocate(): Long {
@@ -60,5 +57,9 @@ class StoreReadOnlyWrapper(protected val store:Store):Store{
     override fun fileLoad() = store.fileLoad()
 
     override fun getAllFiles() = store.getAllFiles()
+
+    override fun isThreadSafe(): Boolean {
+        return store.isThreadSafe();
+    }
 
 }

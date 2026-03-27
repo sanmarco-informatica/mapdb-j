@@ -77,7 +77,7 @@ class BTreeMap<K,V>(
         val valueInline:Boolean,
         val maxNodeSize:Int,
         val comparator:Comparator<K>,
-        override val isThreadSafe:Boolean,
+        val threadSafe:Boolean,
         val counterRecid:Long,
         override val hasValues:Boolean,
         private val modificationListeners: Array<MapModificationListener<K,V>>?
@@ -108,7 +108,7 @@ class BTreeMap<K,V>(
                         rootRecidRecid = rootRecidRecid,
                         maxNodeSize = maxNodeSize,
                         comparator = comparator,
-                        isThreadSafe = isThreadSafe,
+                        threadSafe = isThreadSafe,
                         counterRecid = counterRecid,
                         hasValues = hasValues,
                         modificationListeners = modificationListeners
@@ -2183,6 +2183,10 @@ class BTreeMap<K,V>(
             iter.next()
             iter.remove()
         }
+    }
+
+    override fun isThreadSafe(): Boolean {
+        return threadSafe;
     }
 
     override fun checkThreadSafe(){

@@ -35,7 +35,7 @@ class BTreeMap_PumpTest(
                         if(!isThreadSafe) d.concurrencyDisable()
                         d.make()
                     }
-                    1-> DB(StoreTrivial(), isThreadSafe = isThreadSafe, storeOpened = false)
+                    1-> DB(StoreTrivial(), threadSafe = isThreadSafe, storeOpened = false)
                     2-> {
                         val d = DBMaker.memoryDB()
                         if(!isThreadSafe) d.concurrencyDisable()

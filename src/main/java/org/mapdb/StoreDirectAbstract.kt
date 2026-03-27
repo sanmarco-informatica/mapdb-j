@@ -17,7 +17,7 @@ import java.util.concurrent.locks.ReadWriteLock
 abstract class StoreDirectAbstract(
         val file:String?,
         val volumeFactory: VolumeFactory,
-        override val isThreadSafe:Boolean,
+        val threadSafe:Boolean,
         val concShift:Int,
         val fileDeleteAfterClose:Boolean,
         val checksum:Boolean,

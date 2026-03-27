@@ -12,7 +12,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock
  * Store which does not use serialization, but puts everything into on-heap Map.
  */
 class StoreOnHeap(
-        override val isThreadSafe:Boolean=true
+        val threadSafe:Boolean=true
     ) : Store{
 
     private val lock: ReentrantReadWriteLock? = if(isThreadSafe) ReentrantReadWriteLock() else null
@@ -145,6 +145,10 @@ class StoreOnHeap(
 
     override fun getAllFiles(): Iterable<String> {
         return arrayListOf()
+    }
+
+    override fun isThreadSafe(): Boolean {
+        return isThreadSafe;
     }
 
 }

@@ -134,7 +134,7 @@ class IndexTreeListTest{
         val levels = 3;
         val maxIndex = 1.shl(dirShift*levels)
         val ref = LongLongHashMap()
-        val s = StoreOnHeap(isThreadSafe = false) //minimize deserialization
+        val s = StoreOnHeap(threadSafe = false) //minimize deserialization
         val root = s.put(IndexTreeListJava.dirEmpty(), dirSer);
 
         fun compareContents(){
