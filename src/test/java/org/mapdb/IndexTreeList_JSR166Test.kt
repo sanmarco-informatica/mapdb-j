@@ -7,7 +7,7 @@ class IndexTreeList_JSR166Test:CopyOnWriteArrayListTest(){
 
     override fun emptyArray():MutableList<Int?> {
         val store = StoreDirect.make();
-        val index = IndexTreeLongLongMap.make(store)
+        val index = IndexTreeLongLongMap.make(store, null, null, null, null)
         val list = IndexTreeList(store, index, Serializer.INTEGER, true, store.put(0L, Serializer.LONG_PACKED))
         return list
     }

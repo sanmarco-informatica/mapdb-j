@@ -17,14 +17,14 @@ class IndexTreeLongLongMapTest{
         val maxSize = Math.pow(1L.shl(CC.INDEX_TREE_LONGLONGMAP_DIR_SHIFT).toDouble(),CC.INDEX_TREE_LONGLONGMAP_LEVELS.toDouble())
         val expected = 100L * 1024*1024
         assertTrue(maxSize> expected)
-        val map = IndexTreeLongLongMap.make()
+        val map = IndexTreeLongLongMap.make(null,null,null,null,null)
         map.put(expected, 100L)
         assertEquals(1, map.size())
         assertEquals(100L, map.get(expected))
     }
 
     @Test fun get_Set(){
-        val map = IndexTreeLongLongMap.make()
+        val map = IndexTreeLongLongMap.make(null,null,null,null,null)
 
         map.put(0L, 111L)
         map.put(3423L, 4234L)
@@ -34,7 +34,7 @@ class IndexTreeLongLongMapTest{
     }
 
     @Test fun key_iter(){
-        val map = IndexTreeLongLongMap.make()
+        val map = IndexTreeLongLongMap.make(null,null,null,null,null)
 
         map.put(0L, 111L)
         map.put(3423L, 4234L)
@@ -52,7 +52,7 @@ class IndexTreeLongLongMapTest{
     }
 
     @Test fun zero_val(){
-        val map = IndexTreeLongLongMap.make()
+        val map = IndexTreeLongLongMap.make(null,null,null,null,null)
         map.put(0L,0L);
         assertTrue(map.containsKey(0L))
         map.put(33L,0L);
@@ -60,7 +60,7 @@ class IndexTreeLongLongMapTest{
     }
 
     @Test fun forEachKeyVal(){
-        val map = IndexTreeLongLongMap.make()
+        val map = IndexTreeLongLongMap.make(null,null,null,null,null)
         val ref = LongLongHashMap()
         for(i in 0L until 1000){
             map.put(i, i*10)
@@ -84,24 +84,24 @@ class IndexTreeLongLongMapTest{
         }
 
         override fun getEmptyMap(): MutableLongLongMap? {
-            return IndexTreeLongLongMap.make()
+            return IndexTreeLongLongMap.make(null,null,null,null,null)
         }
 
         override fun newWithKeysValues(key1: Long, value1: Long): MutableLongLongMap? {
-            val ret = IndexTreeLongLongMap.make()
+            val ret = IndexTreeLongLongMap.make(null,null,null,null,null)
             ret.put(key1, value1);
             return ret
         }
 
         override fun newWithKeysValues(key1: Long, value1: Long, key2: Long, value2: Long): MutableLongLongMap? {
-            val ret = IndexTreeLongLongMap.make()
+            val ret = IndexTreeLongLongMap.make(null,null,null,null,null)
             ret.put(key1, value1);
             ret.put(key2, value2);
             return ret
         }
 
         override fun newWithKeysValues(key1: Long, value1: Long, key2: Long, value2: Long, key3: Long, value3: Long): MutableLongLongMap? {
-            val ret = IndexTreeLongLongMap.make()
+            val ret = IndexTreeLongLongMap.make(null,null,null,null,null)
             ret.put(key1, value1);
             ret.put(key2, value2);
             ret.put(key3, value3);
@@ -109,7 +109,7 @@ class IndexTreeLongLongMapTest{
         }
 
         override fun newWithKeysValues(key1: Long, value1: Long, key2: Long, value2: Long, key3: Long, value3: Long, key4: Long, value4: Long): MutableLongLongMap? {
-            val ret = IndexTreeLongLongMap.make()
+            val ret = IndexTreeLongLongMap.make(null,null,null,null,null)
             ret.put(key1, value1);
             ret.put(key2, value2);
             ret.put(key3, value3);
@@ -133,7 +133,7 @@ class IndexTreeLongLongMapTest{
     class GSLongLongHashMapKeySetTest: LongLongHashMapKeySetTest(){
 
         override fun classUnderTest(): MutableLongSet {
-            val v =  IndexTreeLongLongMap.make()
+            val v =  IndexTreeLongLongMap.make(null,null,null,null,null)
             v.put(1L,1L)
             v.put(2L,2L)
             v.put(3L,3L)
@@ -141,7 +141,7 @@ class IndexTreeLongLongMapTest{
         }
 
         override fun newWith(vararg elements: Long): MutableLongSet {
-            val map = IndexTreeLongLongMap.make()
+            val map = IndexTreeLongLongMap.make(null,null,null,null,null)
             for (i in elements.indices) {
                 map.put(elements[i], i.toLong())
             }
@@ -153,7 +153,7 @@ class IndexTreeLongLongMapTest{
     class GSLongLongHashMapKeysViewTest : AbstractLazyLongIterableTestCase(){
 
         override fun classUnderTest(): LazyLongIterable? {
-            val v =  IndexTreeLongLongMap.make()
+            val v =  IndexTreeLongLongMap.make(null,null,null,null,null)
             v.put(1L,1L)
             v.put(2L,2L)
             v.put(3L,3L)
@@ -161,11 +161,11 @@ class IndexTreeLongLongMapTest{
         }
 
         override fun getEmptyIterable(): LazyLongIterable? {
-            return IndexTreeLongLongMap.make().keysView()
+            return IndexTreeLongLongMap.make(null,null,null,null,null).keysView()
         }
 
         override fun newWith(element1: Long, element2: Long): LazyLongIterable? {
-            val v =  IndexTreeLongLongMap.make()
+            val v =  IndexTreeLongLongMap.make(null,null,null,null,null)
             v.put(element1, 1L)
             v.put(element2, 2L)
             return v.keysView()
@@ -175,7 +175,7 @@ class IndexTreeLongLongMapTest{
 
     class GSLongLongHashMapKeyValuesViewTest: AbstractLongLongMapKeyValuesViewTestCase(){
         override fun newWithKeysValues(key1: Long, value1: Long, key2: Long, value2: Long, key3: Long, value3: Long): MutableLongLongMap {
-            val v =  IndexTreeLongLongMap.make()
+            val v =  IndexTreeLongLongMap.make(null,null,null,null,null)
             v.put(key1,value1)
             v.put(key2,value2)
             v.put(key3,value3)
@@ -183,14 +183,14 @@ class IndexTreeLongLongMapTest{
         }
 
         override fun newWithKeysValues(key1: Long, value1: Long, key2: Long, value2: Long): MutableLongLongMap {
-            val v =  IndexTreeLongLongMap.make()
+            val v =  IndexTreeLongLongMap.make(null,null,null,null,null)
             v.put(key1,value1)
             v.put(key2,value2)
             return v
         }
 
         override fun newWithKeysValues(key1: Long, value1: Long): MutableLongLongMap {
-            val v =  IndexTreeLongLongMap.make()
+            val v =  IndexTreeLongLongMap.make(null,null,null,null,null)
             v.put(key1,value1)
             return v
         }
@@ -203,7 +203,7 @@ class IndexTreeLongLongMapTest{
     class GSLongLongHashMapValuesTest: LongLongHashMapValuesTest(){
 
         override fun classUnderTest(): MutableLongCollection? {
-            val v =  IndexTreeLongLongMap.make()
+            val v =  IndexTreeLongLongMap.make(null,null,null,null,null)
             v.put(1L,1L)
             v.put(2L,2L)
             v.put(3L,3L)
@@ -211,14 +211,14 @@ class IndexTreeLongLongMapTest{
         }
 
         override fun newWith(vararg elements: Long): MutableLongCollection? {
-            val v =  IndexTreeLongLongMap.make()
+            val v =  IndexTreeLongLongMap.make(null,null,null,null,null)
             for(i in 0 until elements.size)
                 v.put(i.toLong(), elements[i])
             return v.values()
         }
 
         override fun newWithKeysValues(vararg args: Long): MutableLongLongMap? {
-            val v =  IndexTreeLongLongMap.make()
+            val v =  IndexTreeLongLongMap.make(null,null,null,null,null)
             var i=0;
             while(i<args.size)
                 v.put(args[i++], args[i++])
@@ -232,7 +232,7 @@ class IndexTreeLongLongMapTest{
         if(TT.shortTest())
             return
 
-        concModTest( IndexTreeLongLongMap.make(collapseOnRemove = true))
+        concModTest( IndexTreeLongLongMap.make(null,null,null,null, true))
     }
 
 
@@ -240,7 +240,7 @@ class IndexTreeLongLongMapTest{
         if(TT.shortTest())
             return
 
-        concModTest( IndexTreeLongLongMap.make(collapseOnRemove = false))
+        concModTest( IndexTreeLongLongMap.make(null,null,null,null, false))
     }
 
 
