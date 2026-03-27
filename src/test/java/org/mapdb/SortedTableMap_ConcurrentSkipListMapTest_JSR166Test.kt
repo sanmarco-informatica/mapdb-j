@@ -11,8 +11,7 @@ import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.ConcurrentNavigableMap
 import java.util.concurrent.ConcurrentSkipListMap
 
-class SortedTableMap_ConcurrentSkipListMapTest_JSR166Test() : ConcurrentSkipListMapTest()
-{
+class SortedTableMap_ConcurrentSkipListMapTest_JSR166Test() : ConcurrentSkipListMapTest() {
 
     override fun isReadOnly(): Boolean {
         return true
@@ -20,9 +19,10 @@ class SortedTableMap_ConcurrentSkipListMapTest_JSR166Test() : ConcurrentSkipList
 
     override fun map5(): ConcurrentNavigableMap<*, *>? {
         val consumer = SortedTableMap.createFromSink(
-                keySerializer = Serializer.INTEGER,
-                valueSerializer = Serializer.STRING_INTERN,
-                volume = CC.DEFAULT_MEMORY_VOLUME_FACTORY.makeVolume(null, false))
+            Serializer.INTEGER,
+            Serializer.STRING_INTERN,
+            CC.DEFAULT_MEMORY_VOLUME_FACTORY.makeVolume(null, false), null, null
+        )
         consumer.put(Pair(JSR166TestCase.one, "A"))
         consumer.put(Pair(JSR166TestCase.two, "B"))
         consumer.put(Pair(JSR166TestCase.three, "C"))
@@ -33,18 +33,18 @@ class SortedTableMap_ConcurrentSkipListMapTest_JSR166Test() : ConcurrentSkipList
 
     override fun emptyMap(): ConcurrentNavigableMap<Int, String>? {
         return SortedTableMap.createFromSink(
-                keySerializer = Serializer.INTEGER,
-                valueSerializer = Serializer.STRING_INTERN,
-                volume = CC.DEFAULT_MEMORY_VOLUME_FACTORY.makeVolume(null, false))
-        .create()
+            Serializer.INTEGER,
+            Serializer.STRING_INTERN,
+            CC.DEFAULT_MEMORY_VOLUME_FACTORY.makeVolume(null, false), null, null
+        )
+            .create()
     }
 
     override fun emptyIntMap(): ConcurrentNavigableMap<Int, Int>? {
         throw AssertionError()
     }
 
-    override fun testEquals()
-    {
+    override fun testEquals() {
         val map1 = map5()
         val map2 = map5()
         assertEquals(map1, map2)
@@ -56,7 +56,10 @@ class SortedTableMap_ConcurrentSkipListMapTest_JSR166Test() : ConcurrentSkipList
     override fun testClear() {}
     override fun testPollLastEntry() {}
     override fun testPollFirstEntry() {}
-    override fun testRemove3() {throw NullPointerException()}
+    override fun testRemove3() {
+        throw NullPointerException()
+    }
+
     override fun testPutAll() {}
     override fun testPut1_NullPointerException() {}
     override fun testRemove() {}
@@ -73,16 +76,18 @@ class SortedTableMap_ConcurrentSkipListMapTest_JSR166Test() : ConcurrentSkipList
 
     override fun populatedIntMap(limit: Int): NavigableMap<Int, Int>? {
         val consumer = SortedTableMap.createFromSink(
-                keySerializer = Serializer.INTEGER,
-                valueSerializer = Serializer.INTEGER,
-                volume = CC.DEFAULT_MEMORY_VOLUME_FACTORY.makeVolume(null, false))
+            Serializer.INTEGER,
+            Serializer.INTEGER,
+            CC.DEFAULT_MEMORY_VOLUME_FACTORY.makeVolume(null, false),
+            null, null
+        )
 
         var i = 0
         val n = 2 * limit / 3
-        val map = java.util.TreeMap<Int,Int>()
+        val map = java.util.TreeMap<Int, Int>()
         while (i < n) {
             val key = rnd.nextInt(limit)
-            map.put(key,key*2)
+            map.put(key, key * 2)
             bs.set(key)
             i++
         }

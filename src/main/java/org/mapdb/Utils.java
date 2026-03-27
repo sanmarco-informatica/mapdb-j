@@ -33,6 +33,10 @@ public final class Utils {
         return (new File(path.toFile().getPath() + suffix)).toPath();
     }
 
+    public static <T, E extends Throwable> T sneakyThrow(Throwable e) throws E {
+        throw (E) e;
+    }
+
     public static void logDebug(@NotNull Supplier<String> msg) {
         if (getLOG().isLoggable(Level.FINE)) {
             getLOG().log(Level.FINE, msg.get());
