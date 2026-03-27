@@ -474,10 +474,10 @@ open class DB(
     }
 
     fun <E> get(name:String):E{
-        Utils.lockWrite(lock) {
+        return Utils.lockWrite(lock) {
             checkNotClosed()
             val type = nameCatalogGet(name + Keys.type)
-            return when (type) {
+            return@lockWrite when (type) {
                 "HashMap" -> hashMap(name).open()
                 "HashSet" -> hashSet(name).open()
                 "TreeMap" -> treeMap(name).open()
@@ -502,9 +502,9 @@ open class DB(
             namesInstanciated.asMap().filterValues { it===e }.keys.firstOrNull()
 
     fun exists(name: String): Boolean {
-        Utils.lockRead(lock) {
+        return Utils.lockRead(lock) {
             checkNotClosed()
-            return nameCatalogGet(name + Keys.type) != null
+            return@lockRead nameCatalogGet(name + Keys.type) != null
         }
     }
 
@@ -1369,7 +1369,7 @@ open class DB(
         open fun open():E = make2( false)
 
         protected fun make2(create:Boolean?):E{
-            Utils.lockWrite(db.lock){
+            return Utils.lockWrite(db.lock){
                 db.checkNotClosed()
                 verify()
 
@@ -1389,12 +1389,12 @@ open class DB(
 
                 val ref = db.namesInstanciated.getIfPresent(name)
                 if(ref!=null)
-                    return ref as E;
+                    return@lockWrite ref as E;
 
                 if(typeFromDb!=null) {
                     val ret = open2(catalog)
                     db.namesInstanciated.put(name,ret as Any)
-                    return ret;
+                    return@lockWrite ret;
                 }
 
                 if(db.store.isReadOnly)
@@ -1403,7 +1403,7 @@ open class DB(
                 val ret = create2(catalog)
                 db.nameCatalogSaveLocked(catalog)
                 db.namesInstanciated.put(name,ret as Any)
-                return ret
+                return@lockWrite ret
             }
         }
 

@@ -129,8 +129,8 @@ open class StoreTrivial(
     }
 
     override fun preallocate(): Long {
-        Utils.lockWrite(lock) {
-            return preallocateInternal();
+        return Utils.lockWrite(lock) {
+            return@lockWrite preallocateInternal();
         }
     }
 
@@ -153,12 +153,12 @@ open class StoreTrivial(
 
     override fun <R> put(record: R?, serializer: Serializer<R>): Long {
         val bytes = toByteArray(record, serializer)
-        Utils.lockWrite(lock) {
+        return Utils.lockWrite(lock) {
             val recid = preallocateInternal()
             val old =records.put(recid, bytes)
             if(CC.ASSERT && old!=NULL_RECORD)
                 throw AssertionError("wrong preallocation")
-            return recid;
+            return@lockWrite recid;
         }
     }
 
@@ -177,21 +177,21 @@ open class StoreTrivial(
         val expectedOld:ByteArray = toByteArray(expectedOldRecord, serializer)
 
         //TODO stamped lock?
-        Utils.lockWrite(lock) {
+        return Utils.lockWrite(lock) {
             val old = records.get(recid)
                     ?: throw DBException.GetVoid(recid);
 
             //handle nulls, compare by reference equality
             if (expectedOldRecord == null && !(old === NULL_RECORD)) {
-                return false
+                return@lockWrite false
             }
 
             if (!Arrays.equals(expectedOld, old)) {
-                return false
+                return@lockWrite false
             }
 
             records.put(recid, toByteArray(newRecord, serializer))
-            return true
+            return@lockWrite true
         }
     }
 
@@ -276,9 +276,9 @@ open class StoreTrivial(
         if(this===other)
             return true;
 
-        Utils.lockRead(lock) {
+        return Utils.lockRead(lock) {
             if (records.size() != other.records.size())
-                return false;
+                return@lockRead false;
 
 
             val recidIter = records.keySet().longIterator()
@@ -292,21 +292,21 @@ open class StoreTrivial(
                     continue
 
                 if (b1 !== b2 && !Arrays.equals(b1, b2)) {
-                    return false;
+                    return@lockRead false;
                 }
 
                 if (b1 === NULL_RECORD)
-                    return false;
+                    return@lockRead false;
             }
 
-            return freeRecids.equals(other.freeRecids)
+            return@lockRead freeRecids.equals(other.freeRecids)
         }
     }
 
 
     override fun getAllRecids(): LongIterator {
-        Utils.lockRead(lock) {
-            return records.keySet().toArray().iterator()
+        return Utils.lockRead(lock) {
+            return@lockRead records.keySet().toArray().iterator()
         }
     }
 
@@ -322,7 +322,7 @@ open class StoreTrivial(
     }
 
     override fun isThreadSafe(): Boolean {
-        return isThreadSafe;
+        return threadSafe;
     }
 
 }
@@ -452,7 +452,7 @@ class StoreTrivialTx(val file:File, isThreadSafe:Boolean=true, val deleteFilesAf
             if(lastFileNum===-1L){
                 //no commit was made yet, revert to empty state
                 clearInternal()
-                return
+                return@lockWrite
             }
             loadFrom(lastFileNum)
         }

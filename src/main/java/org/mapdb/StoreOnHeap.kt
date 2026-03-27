@@ -40,7 +40,7 @@ class StoreOnHeap(
     }
 
     override fun preallocate(): Long {
-        Utils.lockWrite(lock) {
+        return Utils.lockWrite(lock) {
             val recid =
                     if (freeRecids.isEmpty)
                         maxRecid.incrementAndGet()
@@ -50,15 +50,15 @@ class StoreOnHeap(
             if(records.containsKey(recid))
                 throw DBException.DataCorruption("Old data were not null");
             records.put(recid, NULL_RECORD)
-            return recid;
+            return@lockWrite recid;
         }
     }
 
     override fun <R> put(record: R?, serializer: Serializer<R>): Long {
-        Utils.lockWrite(lock) {
+        return Utils.lockWrite(lock) {
             val recid = preallocate();
             update(recid, record ?: NULL_RECORD as R?, serializer);
-            return recid
+            return@lockWrite recid
         }
     }
 
@@ -73,16 +73,16 @@ class StoreOnHeap(
 
     override fun <R> compareAndSwap(recid: Long, expectedOldRecord: R?, newRecord: R?, serializer: Serializer<R>): Boolean {
         //TODO use StampedLock here?
-        Utils.lockWrite(lock) {
+        return Utils.lockWrite(lock) {
             val old2 = records.get(recid)
                     ?: throw DBException.GetVoid(recid);
 
             val old = unwap<R>(old2, recid);
             if (old != expectedOldRecord)
-                return false;
+                return@lockWrite false;
 
             records.put(recid, newRecord ?: NULL_RECORD)
-            return true;
+            return@lockWrite true;
         }
     }
 
@@ -130,8 +130,8 @@ class StoreOnHeap(
 
 
     override fun getAllRecids(): LongIterator {
-        Utils.lockRead(lock){
-            return records.keySet().toArray().iterator()
+        return Utils.lockRead(lock){
+            return@lockRead records.keySet().toArray().iterator()
         }
     }
 
@@ -148,7 +148,7 @@ class StoreOnHeap(
     }
 
     override fun isThreadSafe(): Boolean {
-        return isThreadSafe;
+        return threadSafe;
     }
 
 }
