@@ -25,10 +25,13 @@ class StoreReadOnlyWrapper(protected val store:Store):Store{
         throw UnsupportedOperationException("Read-only")
     }
 
-    override val isClosed: Boolean
-        get() = store.isClosed
+    override fun isClosed(): Boolean {
+        return store.isClosed
+    }
 
-    override val isReadOnly = true
+    override fun isReadOnly(): Boolean {
+        return true
+    }
 
     override fun preallocate(): Long {
         throw UnsupportedOperationException("Read-only")

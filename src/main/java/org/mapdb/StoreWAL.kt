@@ -111,8 +111,9 @@ class StoreWAL(
 
     protected val allocatedPages = LongArrayList();
 
-    override val isReadOnly = false
-
+    override fun isReadOnly(): Boolean {
+        return false;
+    }
 
     init{
         if(checksum)

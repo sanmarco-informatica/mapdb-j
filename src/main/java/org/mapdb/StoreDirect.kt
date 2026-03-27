@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicLong
 class StoreDirect(
         file:String?,
         volumeFactory: VolumeFactory,
-        override val isReadOnly:Boolean,
+        val readOnly:Boolean,
         fileLockWait:Long,
         threadSafe:Boolean,
         concShift:Int,
@@ -59,7 +59,7 @@ class StoreDirect(
             file = file,
             volumeFactory = volumeFactory,
             fileLockWait = fileLockWait,
-            isReadOnly = isReadOnly,
+            readOnly = isReadOnly,
             threadSafe = isThreadSafe,
             concShift = concShift,
             allocateIncrement = allocateIncrement,
@@ -1055,6 +1055,9 @@ class StoreDirect(
 
     }
 
+    override fun isReadOnly(): Boolean {
+        return readOnly;
+    }
 
     override protected fun freeSizeIncrement(increment: Long) {
         if(CC.ASSERT && increment%16!=0L)

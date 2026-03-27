@@ -227,8 +227,9 @@ open class StoreTrivial(
         }
     }
 
-    override val isClosed:Boolean
-        get()= closed.get()
+    override fun isClosed(): Boolean {
+        return closed.get()
+    }
 
     override fun <R> get(recid: Long, serializer: Serializer<R>): R? {
         val bytes:ByteArray? =
@@ -313,7 +314,9 @@ open class StoreTrivial(
     override fun verify() {
     }
 
-    override val isReadOnly = false
+    override fun isReadOnly(): Boolean {
+        return false
+    }
 
     override fun fileLoad() = false
 
