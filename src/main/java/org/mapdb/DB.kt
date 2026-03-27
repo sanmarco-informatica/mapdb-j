@@ -1058,13 +1058,15 @@ open class DB(
         fun createFromSink(): TreeMapSink<K,V>{
 
             val consumer = Pump.treeMap(
-                    store = db.store,
-                    keySerializer = _keySerializer,
-                    valueSerializer = _valueSerializer,
-                    //TODO add custom comparator, once its enabled
-                    dirNodeSize = _maxNodeSize *3/4,
-                    leafNodeSize = _maxNodeSize *3/4,
-                    valueInline = _valueInline
+                db.store,
+                _keySerializer,
+                _valueSerializer,
+                null,
+                //TODO add custom comparator, once its enabled
+                _maxNodeSize * 3 / 4,
+                _maxNodeSize * 3 / 4,
+                null,
+                _valueInline
             )
 
             return object: TreeMapSink<K,V>(){

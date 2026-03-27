@@ -133,13 +133,13 @@ public class BTreeMapJava {
         }
     }
 
-    public static class NodeSerializer implements Serializer<Node>{
+    public static class NodeSerializer<K,V> implements Serializer<Node>{
 
-        final GroupSerializer keySerializer;
-        final Comparator comparator;
-        final GroupSerializer valueSerializer;
+        final GroupSerializer<K> keySerializer;
+        final Comparator<K> comparator;
+        final GroupSerializer<V> valueSerializer;
 
-        NodeSerializer(GroupSerializer keySerializer, Comparator comparator, GroupSerializer valueSerializer) {
+        NodeSerializer(GroupSerializer<K> keySerializer, Comparator<K> comparator, GroupSerializer<V> valueSerializer) {
             this.keySerializer = keySerializer;
             this.comparator = comparator;
             this.valueSerializer = valueSerializer;
