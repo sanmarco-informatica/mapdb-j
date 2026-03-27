@@ -3,15 +3,15 @@ package org.mapdb
 import org.mapdb.guavaTests.ConcurrentMapInterfaceTest
 import java.util.concurrent.ConcurrentMap
 
-class SortedTableMap_ConcurrentMap_Guava:
-        ConcurrentMapInterfaceTest<Int, String>(
-            false,  // boolean allowsNullKeys,
-            false,  // boolean allowsNullValues,
-            false,   // boolean supportsPut,
-            false,   // boolean supportsRemove,
-            false,   // boolean supportsClear,
-            false    // boolean supportsIteratorRemove
-){
+class SortedTableMap_ConcurrentMap_Guava :
+    ConcurrentMapInterfaceTest<Int, String>(
+        false,  // boolean allowsNullKeys,
+        false,  // boolean allowsNullValues,
+        false,   // boolean supportsPut,
+        false,   // boolean supportsRemove,
+        false,   // boolean supportsClear,
+        false    // boolean supportsIteratorRemove
+    ) {
     override fun getKeyNotInPopulatedMap(): Int? {
         return 51
     }
@@ -26,21 +26,21 @@ class SortedTableMap_ConcurrentMap_Guava:
 
     override fun makeEmptyMap(): ConcurrentMap<Int, String>? {
         val consumer = SortedTableMap.createFromSink(
-                keySerializer = Serializer.INTEGER,
-                valueSerializer = Serializer.STRING,
-                volume = CC.DEFAULT_MEMORY_VOLUME_FACTORY.makeVolume(null, false)
-            )
+            Serializer.INTEGER,
+            Serializer.STRING,
+            CC.DEFAULT_MEMORY_VOLUME_FACTORY.makeVolume(null, false), null, null
+        )
         return consumer.create()
     }
 
     override fun makePopulatedMap(): ConcurrentMap<Int, String>? {
         val consumer = SortedTableMap.createFromSink(
-                keySerializer = Serializer.INTEGER,
-                valueSerializer = Serializer.STRING,
-                volume = CC.DEFAULT_MEMORY_VOLUME_FACTORY.makeVolume(null, false)
-            )
-        for(i in 1..100){
-            consumer.put(Pair(i*2, ""+i*10))
+            Serializer.INTEGER,
+            Serializer.STRING,
+            CC.DEFAULT_MEMORY_VOLUME_FACTORY.makeVolume(null, false), null, null
+        )
+        for (i in 1..100) {
+            consumer.put(Pair(i * 2, "" + i * 10))
         }
 
         return consumer.create()
