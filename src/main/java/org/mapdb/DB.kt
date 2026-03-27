@@ -34,7 +34,7 @@ open class DB(
         private val store:Store,
         /** True if store existed before and was opened, false if store was created and is completely empty */
         protected val storeOpened:Boolean,
-        override val isThreadSafe:Boolean = true,
+        val threadSafe:Boolean = true,
         val classLoader:ClassLoader = Thread.currentThread().contextClassLoader,
         /** type of shutdown hook, 0 is disabled, 1 is hard ref, 2 is weak ref*/
         val shutdownHook:Int = 0
@@ -154,7 +154,7 @@ open class DB(
     }
 
     /** Already loaded named collections. Values are weakly referenced. We need singletons for locking */
-    protected var namesInstanciated: Cache<String, Any?> = CacheBuilder.newBuilder().concurrencyLevel(1).weakValues().build()
+    protected var namesInstanciated: Cache<String, Any> = CacheBuilder.newBuilder().concurrencyLevel(1).weakValues().build()
 
 
     private val classSingletonCat = IdentityHashMap<Any,String>()
@@ -857,7 +857,7 @@ open class DB(
                     expireExecutor = _expireExecutor,
                     expireExecutorPeriod = _expireExecutorPeriod,
                     expireCompactThreshold = _expireCompactThreshold,
-                    isThreadSafe = db.isThreadSafe,
+                    threadSafe = db.isThreadSafe,
                     valueLoader = _valueLoader,
                     modificationListeners = if (_modListeners.isEmpty()) null else _modListeners.toTypedArray(),
                     closeable = db,
@@ -945,7 +945,7 @@ open class DB(
                     expireExecutor = _expireExecutor,
                     expireExecutorPeriod = _expireExecutorPeriod,
                     expireCompactThreshold = _expireCompactThreshold,
-                    isThreadSafe = db.isThreadSafe,
+                    threadSafe = db.isThreadSafe,
                     valueLoader = _valueLoader,
                     modificationListeners = if (_modListeners.isEmpty()) null else _modListeners.toTypedArray(),
                     closeable = db,
@@ -1112,7 +1112,7 @@ open class DB(
                     store = db.store,
                     maxNodeSize = _maxNodeSize,
                     comparator = _keySerializer, //TODO custom comparator
-                    isThreadSafe = db.isThreadSafe,
+                    threadSafe = db.isThreadSafe,
                     counterRecid = counterRecid2,
                     hasValues = hasValues,
                     valueInline = _valueInline,
@@ -1154,7 +1154,7 @@ open class DB(
                     store = db.store,
                     maxNodeSize = _maxNodeSize,
                     comparator = _keySerializer, //TODO custom comparator
-                    isThreadSafe = db.isThreadSafe,
+                    threadSafe = db.isThreadSafe,
                     counterRecid = counterRecid2,
                     hasValues = hasValues,
                     valueInline = _valueInline,
@@ -1393,7 +1393,7 @@ open class DB(
 
                 if(typeFromDb!=null) {
                     val ret = open2(catalog)
-                    db.namesInstanciated.put(name,ret)
+                    db.namesInstanciated.put(name,ret as Any)
                     return ret;
                 }
 
@@ -1402,7 +1402,7 @@ open class DB(
                 catalog.put(name+Keys.type,type)
                 val ret = create2(catalog)
                 db.nameCatalogSaveLocked(catalog)
-                db.namesInstanciated.put(name,ret)
+                db.namesInstanciated.put(name,ret as Any)
                 return ret
             }
         }
@@ -1663,6 +1663,10 @@ open class DB(
 
     fun <E> indexTreeList(name: String, serializer:Serializer<E>) = IndexTreeListMaker(this, name, serializer)
     fun indexTreeList(name: String) = indexTreeList(name, defaultSerializer)
+
+    override fun isThreadSafe(): Boolean {
+        return threadSafe;
+    }
 
 
     override fun checkThreadSafe() {

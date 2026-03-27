@@ -31,7 +31,7 @@ class StoreWAL(
 ):StoreDirectAbstract(
         file=file,
         volumeFactory=volumeFactory,
-        isThreadSafe = isThreadSafe,
+        threadSafe = isThreadSafe,
         concShift =  concShift,
         fileDeleteAfterClose = fileDeleteAfterClose,
         checksum = checksum,
@@ -927,6 +927,10 @@ class StoreWAL(
         val ret = arrayListOf(file)
         ret.addAll(wal.getAllFiles())
         return ret.toList() //immutable copy
+    }
+
+    override fun isThreadSafe(): Boolean {
+        return isThreadSafe;
     }
 
 }

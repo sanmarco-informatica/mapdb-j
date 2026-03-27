@@ -91,7 +91,7 @@ object DBMaker{
 
 
     @JvmStatic fun memoryShardedHashSet(concurrency:Int): DB.HashSetMaker<*> {
-        val db = DB(store = StoreOnHeap(), storeOpened = false, isThreadSafe = true)
+        val db = DB(store = StoreOnHeap(), storeOpened = false, threadSafe = true)
         return DB.HashSetMaker<Any>(db,"map",_storeFactory = { i ->
                 StoreDirect.make(isThreadSafe = false)
             })
@@ -99,15 +99,15 @@ object DBMaker{
     }
 
     @JvmStatic fun heapShardedHashSet(concurrency:Int): DB.HashSetMaker<*> {
-        val db = DB(store = StoreOnHeap(), storeOpened = false, isThreadSafe = true)
+        val db = DB(store = StoreOnHeap(), storeOpened = false, threadSafe = true)
         return DB.HashSetMaker<Any>(db,"map",_storeFactory = { i ->
-                StoreOnHeap(isThreadSafe = false)
+                StoreOnHeap(threadSafe = false)
             })
             .layout(concurrency = concurrency, dirSize = 1.shl(CC.HTREEMAP_DIR_SHIFT), levels = CC.HTREEMAP_LEVELS)
     }
 
     @JvmStatic fun memoryShardedHashMap(concurrency:Int): DB.HashMapMaker<*,*> {
-        val db = DB(store = StoreOnHeap(), storeOpened = false, isThreadSafe = true)
+        val db = DB(store = StoreOnHeap(), storeOpened = false, threadSafe = true)
         return DB.HashMapMaker<Any,Any>(db,"map",_storeFactory = { i ->
                 StoreDirect.make(isThreadSafe = false)
             })
@@ -115,9 +115,9 @@ object DBMaker{
     }
 
     @JvmStatic fun heapShardedHashMap(concurrency:Int): DB.HashMapMaker<*,*> {
-        val db = DB(store = StoreOnHeap(), storeOpened = false, isThreadSafe = true)
+        val db = DB(store = StoreOnHeap(), storeOpened = false, threadSafe = true)
         return DB.HashMapMaker<Any,Any>(db,"map",_storeFactory = { i ->
-                StoreOnHeap(isThreadSafe = false)
+                StoreOnHeap(threadSafe = false)
             })
             .layout(concurrency = concurrency, dirSize = 1.shl(CC.HTREEMAP_DIR_SHIFT), levels = CC.HTREEMAP_LEVELS)
     }
@@ -487,7 +487,7 @@ object DBMaker{
                     storeDir
                 }
 
-            return DB(store=store, storeOpened = storeOpened, isThreadSafe = _isThreadSafe, shutdownHook = _closeOnJvmShutdown)
+            return DB(store=store, storeOpened = storeOpened, threadSafe = _isThreadSafe, shutdownHook = _closeOnJvmShutdown)
         }
     }
 
